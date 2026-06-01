@@ -22,7 +22,6 @@ def scrape_rankings():
     rankings_data = []
     ranking_date = datetime.utcnow().date()
 
-    # ✅ FIX HERE
     ranking_sections = soup.find_all("div", class_="view-grouping")
 
     logging.info(f"Found {len(ranking_sections)} ranking sections")
@@ -39,7 +38,7 @@ def scrape_rankings():
             champion_name = champion_tag.find("h5").get_text(strip=True)
             rankings_data.append({
                 "date": ranking_date,
-                "weightclass": division,
+                "weight_class": division,
                 "fighter": champion_name,
                 "rank": 0
             })
@@ -49,7 +48,7 @@ def scrape_rankings():
             fighter_name = fighter.get_text(strip=True)
             rankings_data.append({
                 "date": ranking_date,
-                "weightclass": division,
+                "weight_class": division,
                 "fighter": fighter_name,
                 "rank": rank
             })
@@ -75,7 +74,7 @@ def insert_rankings_data(rankings_data, engine):
         insert(table)
         .values(rankings_data)
         .on_conflict_do_nothing(
-            index_elements=["date", "weightclass", "fighter"]
+            index_elements=["date", "weight_class", "fighter"]
         )
     )
 

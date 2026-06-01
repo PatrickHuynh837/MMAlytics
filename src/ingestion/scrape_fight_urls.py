@@ -1,14 +1,12 @@
-import requests
-from bs4 import BeautifulSoup
 import logging
 import pandas as pd
-from datetime import datetime
-import logging
+from sqlalchemy import Table, MetaData
 from sqlalchemy.dialects.postgresql import insert
-from sqlalchemy import Table, Column, Text, Date, Integer, Boolean, MetaData
-from src.ingestion.helper_functions import chunk_dataframe, HEADERS
 
-
+from src.ingestion.helper_functions import (
+    chunk_dataframe,
+    get_soup_with_playwright
+)
 
 
 def scrape_fight_urls(engine):
@@ -21,6 +19,7 @@ def scrape_fight_urls(engine):
         ]
 
         if missing_events_df.empty:
+            logging.info("No new events to scrape for fight URLs.")
             return pd.DataFrame()
 
         results = []
@@ -31,20 +30,25 @@ def scrape_fight_urls(engine):
             date = row["event_date"]
 
             try:
-                response = requests.get(event_url, headers=HEADERS, timeout=10)
-                response.raise_for_status()
+                soup = get_soup_with_playwright(
+                    event_url,
+                    parser="lxml",
+                    selector="tr.b-fight-details__table-row"
+                )
 
-                soup = BeautifulSoup(response.text, "lxml")
                 rows = soup.select("tr.b-fight-details__table-row")
 
                 for tr in rows:
                     cols = tr.find_all("td")
+
                     if len(cols) < 2:
                         continue
 
                     fight_tag = cols[0].find("a", href=True)
+
                     if fight_tag:
                         fight_url = fight_tag["href"].strip()
+
                         results.append({
                             "event_url": event_url,
                             "title": title,
@@ -66,9 +70,7 @@ def scrape_fight_urls(engine):
         raise
 
 
-
 def insert_fight_urls(fight_urls, engine):
-    
     if fight_urls is None or fight_urls.empty:
         logging.info("No new fight URLs to insert.")
         return
@@ -76,13 +78,11 @@ def insert_fight_urls(fight_urls, engine):
     metadata = MetaData()
 
     fight_urls_table = Table(
-    "fight_urls",
-    metadata,
-    schema="raw",
-    autoload_with=engine
+        "fight_urls",
+        metadata,
+        schema="raw",
+        autoload_with=engine
     )
-
-    
 
     total_inserted = 0
 
@@ -98,10 +98,3 @@ def insert_fight_urls(fight_urls, engine):
             total_inserted += result.rowcount
 
     logging.info(f"Inserted {total_inserted} new fight_urls.")
-
-
-
-
-
-
-    
