@@ -35,7 +35,7 @@ def get_soup_with_playwright(
         if selector:
             page.wait_for_selector(
                 selector,
-                timeout=5000
+                timeout=timeout
             )
 
         html = page.content()
@@ -117,11 +117,11 @@ def get_striking_stats(stats, fighter):
 
     try:
         return (
-            stats[2 + i].text.strip(),
-            stats[8 + i].text.split(" of ")[1].strip(),
-            stats[8 + i].text.split(" of ")[0].strip(),
-            stats[4 + i].text.split(" of ")[1].strip(),
-            stats[4 + i].text.split(" of ")[0].strip(),
+            stats[2 + i].text.strip(),                    # Knockdowns (KD)
+            stats[8 + i].text.split(" of ")[1].strip(),  # Total Strikes Attempted
+            stats[8 + i].text.split(" of ")[0].strip(),  # Total Strikes Landed
+            stats[4 + i].text.split(" of ")[1].strip(),  # Significant Strikes Attempted
+            stats[4 + i].text.split(" of ")[0].strip(),  # Significant Strikes Landed
         )
 
     except Exception:
@@ -133,11 +133,11 @@ def get_grappling_stats(stats, fighter):
 
     try:
         return (
-            stats[10 + i].text.split(" of ")[1].strip(),
-            stats[10 + i].text.split(" of ")[0].strip(),
-            stats[14 + i].text.strip(),
-            stats[16 + i].text.strip(),
-            stats[18 + i].text.strip(),
+            stats[10 + i].text.split(" of ")[1].strip(), # Takedowns Attempted
+            stats[10 + i].text.split(" of ")[0].strip(), # Takedowns Landed
+            stats[14 + i].text.strip(),                  # Submission Attempts
+            stats[16 + i].text.strip(),                  # Reversals
+            stats[18 + i].text.strip(),                  # Control Time
         )
 
     except Exception:

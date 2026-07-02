@@ -13,14 +13,23 @@ from src.ingestion.scrape_api_odds import *
 from src.ingestion.csv_rankings import *
 from src.ingestion.csv_odds import *
 
-import re
+import re           
 
 DB_URL = (
+    
     "postgresql+psycopg://neondb_owner:npg_Bo2SUY6ngypR@"
     "ep-orange-frost-afcl94sd-pooler.c-2.us-west-2.aws.neon.tech/"
     "neondb?sslmode=require"
+  
 )
 
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    force=True
+)
 
 def main():
 
@@ -36,7 +45,7 @@ def main():
     insert_event_urls(df, engine)
 
 
-    #Scrape & Insert Event Data
+    # #Scrape & Insert Event Data
     df = scrape_event_data(df)
     insert_event_data(df, engine)
 
@@ -48,7 +57,7 @@ def main():
     df = scrape_fight_data(engine)
     insert_fight_data(df, engine)
 
-    #Scrape & Insert Fight Stats
+    # #Scrape & Insert Fight Stats
     df = scrape_fight_stats(engine)
     insert_fight_stats(df, engine)
 

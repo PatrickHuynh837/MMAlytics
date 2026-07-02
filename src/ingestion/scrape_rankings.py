@@ -9,6 +9,8 @@ from src.ingestion.helper_functions import HEADERS
 
 
 def scrape_rankings():
+
+    ##Meta Rankings
     url = "https://www.ufc.com/rankings"
 
     try:
