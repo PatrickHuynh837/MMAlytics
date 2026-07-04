@@ -1,0 +1,77 @@
+
+from preprocessing import *
+from features import create_features, LINEAR_FEATURES
+from models import run_logistic_regression, run_xgboost
+import numpy as np
+import pandas as pd
+import psycopg2
+from sqlalchemy import create_engine
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
+)
+
+
+DB_URL = (
+"postgresql+psycopg://neondb_owner:npg_Bo2SUY6ngypR@"
+    "ep-orange-frost-afcl94sd-pooler.c-2.us-west-2.aws.neon.tech/"
+    "neondb?sslmode=require"
+
+)
+
+engine = create_engine(
+        DB_URL,
+        pool_pre_ping=True,
+        pool_recycle=3600
+        )
+
+
+#Loading Data
+df = pd.read_sql(
+    """
+    SELECT *
+    FROM ml.fight_dataset
+    """,
+    engine
+)
+
+df["fighter_1_win"] = (df["winner"] == df["fighter_1"]).astype(int)
+
+# Preprocess
+df = preprocess_ranks(df)
+df = preprocess_weight(df)
+
+df = df.reset_index(drop=True)
+df["fight_id"] = df.index
+
+history = build_fighter_history(df)
+
+df = add_fighter_cumulative_features(df, history)
+df = add_striking_rolling_features(df, history)
+df = add_grappling_rolling_features(df, history)
+
+# Feature engineering
+df = create_features(df)
+
+# Train
+model, acc, preds, probs, y_test = run_logistic_regression(
+    df,
+    LINEAR_FEATURES,
+    "fighter_1_win"
+)
+
+def evaluate_model(y_true, y_pred, y_prob):
+    print(f"Accuracy: {accuracy_score(y_true, y_pred):.4f}")
+    print(f"ROC AUC: {roc_auc_score(y_true, y_prob):.4f}")
+    print("Classification Report:")
+    print(classification_report(y_true, y_pred))
+    print("Confusion Matrix:")
+    print(confusion_matrix(y_true, y_pred))
+
+# Evaluate
+evaluate_model(y_test, preds, probs)
