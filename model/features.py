@@ -147,3 +147,13 @@ LINEAR_FEATURES = [
     "rank_diff",
     "odds_diff"
 ]
+
+TREE_FEATURES = [
+    # raw stats
+    "fighter_1_slpm", "fighter_2_slpm",
+    "fighter_1_td_def", "fighter_2_td_def",
+    "fighter_1_str_acc", "fighter_2_str_acc",
+
+    # + your diffs
+    *LINEAR_FEATURES
+]
