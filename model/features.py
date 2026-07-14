@@ -115,6 +115,235 @@ def create_perception_features(df):
     return df
 
 
+def create_ratio_features(df):
+    """Create ratio-based features for tree models (XGBoost)."""
+
+    df = df.copy()
+
+    eps = 1e-6
+
+    # ==========================
+    # Experience Ratios
+    # ==========================
+
+    df["win_ratio"] = (
+        (df["fighter_1_wins"] + 1) /
+        (df["fighter_2_wins"] + 1)
+    )
+
+    df["loss_ratio"] = (
+        (df["fighter_1_losses"] + 1) /
+        (df["fighter_2_losses"] + 1)
+    )
+
+    df["draw_ratio"] = (
+        (df["fighter_1_draws"] + 1) /
+        (df["fighter_2_draws"] + 1)
+    )
+
+    fighter_1_total_fights = (
+        df["fighter_1_wins"] +
+        df["fighter_1_losses"] +
+        df["fighter_1_draws"]
+    )
+
+    fighter_2_total_fights = (
+        df["fighter_2_wins"] +
+        df["fighter_2_losses"] +
+        df["fighter_2_draws"]
+    )
+
+    df["experience_ratio"] = (
+        (fighter_1_total_fights + 1) /
+        (fighter_2_total_fights + 1)
+    )
+
+
+    # Win percentage advantage
+
+    fighter_1_win_pct = (
+        df["fighter_1_wins"] /
+        (fighter_1_total_fights + 1)
+    )
+
+    fighter_2_win_pct = (
+        df["fighter_2_wins"] /
+        (fighter_2_total_fights + 1)
+    )
+
+    df["win_pct_ratio"] = (
+        (fighter_1_win_pct + eps) /
+        (fighter_2_win_pct + eps)
+    )
+
+
+    # ==========================
+    # Physical Ratios
+    # ==========================
+
+    df["height_ratio"] = (
+        df["fighter_1_height_cm"] /
+        (df["fighter_2_height_cm"] + eps)
+    )
+
+    df["reach_ratio"] = (
+        df["fighter_1_reach_cm"] /
+        (df["fighter_2_reach_cm"] + eps)
+    )
+
+    df["weight_ratio"] = (
+        df["fighter_1_weight_lbs"] /
+        (df["fighter_2_weight_lbs"] + eps)
+    )
+
+
+    # ==========================
+    # Striking Ratios
+    # ==========================
+
+    df["slpm_ratio"] = (
+        df["fighter_1_slpm"] /
+        (df["fighter_2_slpm"] + eps)
+    )
+
+    df["sapm_ratio"] = (
+        df["fighter_1_sapm"] /
+        (df["fighter_2_sapm"] + eps)
+    )
+
+    df["str_acc_ratio"] = (
+        df["fighter_1_str_acc"] /
+        (df["fighter_2_str_acc"] + eps)
+    )
+
+    df["str_def_ratio"] = (
+        df["fighter_1_str_def"] /
+        (df["fighter_2_str_def"] + eps)
+    )
+
+
+    # Combined striking dominance
+
+    df["strike_efficiency_ratio"] = (
+        (
+            df["fighter_1_slpm"] *
+            df["fighter_1_str_acc"]
+        )
+        /
+        (
+            df["fighter_2_slpm"] *
+            df["fighter_2_str_acc"]
+            + eps
+        )
+    )
+
+    df["damage_resistance_ratio"] = (
+        df["fighter_2_sapm"] /
+        (df["fighter_1_sapm"] + eps)
+    )
+
+
+    # ==========================
+    # Grappling Ratios
+    # ==========================
+
+    df["td_avg_ratio"] = (
+        df["fighter_1_td_avg"] /
+        (df["fighter_2_td_avg"] + eps)
+    )
+
+    df["td_acc_ratio"] = (
+        df["fighter_1_td_acc"] /
+        (df["fighter_2_td_acc"] + eps)
+    )
+
+    df["td_def_ratio"] = (
+        df["fighter_1_td_def"] /
+        (df["fighter_2_td_def"] + eps)
+    )
+
+    df["sub_avg_ratio"] = (
+        df["fighter_1_sub_avg"] /
+        (df["fighter_2_sub_avg"] + eps)
+    )
+
+
+    df["grappling_control_ratio"] = (
+        (
+            df["fighter_1_td_avg"] +
+            df["fighter_1_sub_avg"]
+        )
+        /
+        (
+            df["fighter_2_td_avg"] +
+            df["fighter_2_sub_avg"] +
+            eps
+        )
+    )
+
+
+    # ==========================
+    # Recent Form Ratios
+    # ==========================
+
+    df["recent_slpm_ratio"] = (
+        df["fighter_1_slpm_roll_3"] /
+        (df["fighter_2_slpm_roll_3"] + eps)
+    )
+
+    df["recent_sapm_ratio"] = (
+        df["fighter_1_sapm_roll_3"] /
+        (df["fighter_2_sapm_roll_3"] + eps)
+    )
+
+    df["recent_str_acc_ratio"] = (
+        df["fighter_1_str_acc_roll_3"] /
+        (df["fighter_2_str_acc_roll_3"] + eps)
+    )
+
+    df["recent_str_def_ratio"] = (
+        df["fighter_1_str_def_roll_3"] /
+        (df["fighter_2_str_def_roll_3"] + eps)
+    )
+
+    df["recent_td_success_ratio"] = (
+        df["fighter_1_td_success_rate_roll_3"] /
+        (df["fighter_2_td_success_rate_roll_3"] + eps)
+    )
+
+
+    df["recent_performance_ratio"] = (
+        (
+            df["fighter_1_slpm_roll_3"] *
+            df["fighter_1_str_acc_roll_3"]
+        )
+        /
+        (
+            df["fighter_2_slpm_roll_3"] *
+            df["fighter_2_str_acc_roll_3"]
+            + eps
+        )
+    )
+
+
+    # ==========================
+    # Ranking + Market Ratios
+    # ==========================
+
+    df["rank_ratio"] = (
+        (df["fighter_2_rank"] + 1) /
+        (df["fighter_1_rank"] + 1)
+    )
+
+    df["odds_ratio"] = (
+        (df["fighter_1_odds"] + 1) /
+        (df["fighter_2_odds"] + 1)
+    )
+
+
+    return df
+
+
 def create_features(df):
     """Run all feature engineering."""
 
@@ -123,6 +352,7 @@ def create_features(df):
     df = create_striking_features(df)
     df = create_grappling_features(df)
     df = create_perception_features(df)
+    df = create_ratio_features(df)
 
     return df
 
@@ -149,11 +379,71 @@ LINEAR_FEATURES = [
 ]
 
 TREE_FEATURES = [
-    # raw stats
-    "fighter_1_slpm", "fighter_2_slpm",
-    "fighter_1_td_def", "fighter_2_td_def",
-    "fighter_1_str_acc", "fighter_2_str_acc",
 
-    # + your diffs
+    # ==========================
+    # Market / perception
+    # ==========================
+
+    "odds_ratio",
+    "rank_ratio",
+
+
+    # ==========================
+    # Experience
+    # ==========================
+
+    "experience_ratio",
+    "win_pct_ratio",
+    "win_ratio",
+
+
+    # ==========================
+    # Physical advantages
+    # ==========================
+
+    "height_ratio",
+    "reach_ratio",
+    "weight_ratio",
+
+
+    # ==========================
+    # Striking matchup
+    # ==========================
+
+    "slpm_ratio",
+    "sapm_ratio",
+    "str_acc_ratio",
+    "str_def_ratio",
+    "strike_efficiency_ratio",
+    "damage_resistance_ratio",
+
+
+    # ==========================
+    # Grappling matchup
+    # ==========================
+
+    "td_avg_ratio",
+    "td_acc_ratio",
+    "td_def_ratio",
+    "sub_avg_ratio",
+    "grappling_control_ratio",
+
+
+    # ==========================
+    # Recent form
+    # ==========================
+
+    "recent_slpm_ratio",
+    "recent_sapm_ratio",
+    "recent_str_acc_ratio",
+    "recent_str_def_ratio",
+    "recent_td_success_ratio",
+    "recent_performance_ratio",
+
+
+    # ==========================
+    # Existing differential features
+    # ==========================
+
     *LINEAR_FEATURES
 ]
