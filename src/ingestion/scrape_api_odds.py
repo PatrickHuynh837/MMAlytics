@@ -6,7 +6,7 @@ from sqlalchemy import Table, MetaData
 from sqlalchemy.dialects.postgresql import insert
 
 
-API_KEY = "52db7e441b2ddea45f7e6634da0e6124"  # Insert your TheOddsAPI key here
+API_KEY = ""  # Insert your TheOddsAPI key here
 
 BOOKMAKER_REGIONS = {
     "DraftKings": "us",
