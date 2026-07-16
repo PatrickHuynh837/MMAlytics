@@ -631,6 +631,8 @@ LINEAR_FEATURES = [
 
 
 
+
+
 # ==========================================
 # Tree Model Features
 # XGBoost
@@ -639,6 +641,94 @@ LINEAR_FEATURES = [
 # - Trees learn interactions automatically
 # - Give clean matchup signals
 # ==========================================
+
+# TREE_FEATURES = [
+
+#     # --------------------------
+#     # Market / Perception
+#     # --------------------------
+
+#     "odds_ratio",
+#     "rank_ratio",
+
+#     "odds_diff",
+#     "rank_diff",
+
+
+#     # --------------------------
+#     # Experience
+#     # --------------------------
+
+#     "win_ratio",
+#     "win_pct_ratio",
+#     "experience_ratio",
+
+#     "win_diff",
+#     "loss_diff",
+
+
+#     # --------------------------
+#     # Physical Matchup
+#     # --------------------------
+
+#     "height_ratio",
+#     "reach_ratio",
+#     "weight_ratio",
+
+#     "height_diff",
+#     "reach_diff",
+#     "weight_diff",
+
+
+#     # --------------------------
+#     # Striking
+#     # --------------------------
+
+#     "slpm_ratio",
+#     "sapm_ratio",
+#     "str_acc_ratio",
+#     "str_def_ratio",
+
+#     "strike_efficiency_ratio",
+#     "damage_resistance_ratio",
+
+#     "slpm_roll_3_diff",
+#     "sapm_roll_3_diff",
+#     "str_acc_roll_3_diff",
+#     "str_def_roll_3_diff",
+
+
+#     # --------------------------
+#     # Grappling
+#     # --------------------------
+
+#     "td_avg_ratio",
+#     "td_acc_ratio",
+#     "td_def_ratio",
+#     "sub_avg_ratio",
+
+#     "grappling_control_ratio",
+
+#     "td_avg_roll_3_diff",
+#     "td_acc_roll_3_diff",
+#     "td_def_roll_3_diff",
+#     "sub_avg_roll_3_diff",
+#     "ctrl_time_roll_3_diff",
+#     "td_success_rate_roll_3_diff",
+
+
+#     # --------------------------
+#     # Recent Form
+#     # --------------------------
+
+#     "recent_slpm_ratio",
+#     "recent_sapm_ratio",
+#     "recent_str_acc_ratio",
+#     "recent_str_def_ratio",
+
+#     "recent_td_success_ratio",
+#     "recent_performance_ratio",
+# ]
 
 TREE_FEATURES = [
 
@@ -663,6 +753,7 @@ TREE_FEATURES = [
 
     "win_diff",
     "loss_diff",
+    "draw_diff",
 
 
     # --------------------------
@@ -676,6 +767,7 @@ TREE_FEATURES = [
     "height_diff",
     "reach_diff",
     "weight_diff",
+    "age_diff",
 
 
     # --------------------------
@@ -690,10 +782,17 @@ TREE_FEATURES = [
     "strike_efficiency_ratio",
     "damage_resistance_ratio",
 
+    # raw matchup differentials
     "slpm_roll_3_diff",
     "sapm_roll_3_diff",
     "str_acc_roll_3_diff",
     "str_def_roll_3_diff",
+
+
+    # handcrafted striking interactions
+    "strike_quality_diff",
+    "damage_balance_diff",
+    "reach_striking_advantage",
 
 
     # --------------------------
@@ -707,12 +806,18 @@ TREE_FEATURES = [
 
     "grappling_control_ratio",
 
+    # raw matchup differentials
     "td_avg_roll_3_diff",
     "td_acc_roll_3_diff",
     "td_def_roll_3_diff",
     "sub_avg_roll_3_diff",
     "ctrl_time_roll_3_diff",
     "td_success_rate_roll_3_diff",
+
+
+    # handcrafted grappling interactions
+    "grappling_control_diff",
+    "submission_advantage",
 
 
     # --------------------------
@@ -726,4 +831,28 @@ TREE_FEATURES = [
 
     "recent_td_success_ratio",
     "recent_performance_ratio",
+
+    "recent_striking_momentum",
+    "recent_accuracy_advantage",
+
+
+    # --------------------------
+    # Experience Interactions
+    # --------------------------
+
+    "experience_win_quality",
+
+
+    # --------------------------
+    # Physical Interactions
+    # --------------------------
+
+    "size_advantage",
+
+
+    # --------------------------
+    # Market + Performance
+    # --------------------------
+
+    "market_stat_mismatch",
 ]
