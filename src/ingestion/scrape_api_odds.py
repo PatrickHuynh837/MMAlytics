@@ -4,9 +4,16 @@ import pandas as pd
 from datetime import datetime, timezone
 from sqlalchemy import Table, MetaData
 from sqlalchemy.dialects.postgresql import insert
+import os
+from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
-API_KEY = ""  # Insert your TheOddsAPI key here
+API_KEY = os.getenv("THE_ODDS_API_KEY")
+
+if not API_KEY:
+    raise ValueError("THE_ODDS_API_KEY is missing from environment variables")
 
 BOOKMAKER_REGIONS = {
     "DraftKings": "us",
