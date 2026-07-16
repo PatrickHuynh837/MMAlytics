@@ -1,8 +1,13 @@
 from preprocessing import *
 from features import create_features, LINEAR_FEATURES, TREE_FEATURES
-from models import run_logistic_regression, run_xgboost
 
-import numpy as np
+from models import (
+    run_logistic_regression,
+    run_xgboost,
+    run_random_forest,
+    run_catboost
+)
+
 import pandas as pd
 from sqlalchemy import create_engine
 
@@ -11,10 +16,9 @@ from sklearn.metrics import (
     classification_report,
     confusion_matrix,
     f1_score,
-    precision_score,
-    recall_score,
     roc_auc_score,
 )
+
 
 # =========================
 # DB CONNECTION
@@ -32,6 +36,7 @@ engine = create_engine(
     pool_recycle=3600
 )
 
+
 # =========================
 # LOAD DATA
 # =========================
@@ -44,7 +49,12 @@ df = pd.read_sql(
     engine
 )
 
-df["fighter_1_win"] = (df["winner"] == df["fighter_1"]).astype(int)
+
+df["fighter_1_win"] = (
+    df["winner"] == df["fighter_1"]
+).astype(int)
+
+
 
 # =========================
 # PREPROCESSING
@@ -54,13 +64,31 @@ df = preprocess_ranks(df)
 df = preprocess_weight(df)
 
 df = df.reset_index(drop=True)
+
 df["fight_id"] = df.index
+
 
 history = build_fighter_history(df)
 
-df = add_fighter_cumulative_features(df, history)
-df = add_striking_rolling_features(df, history)
-df = add_grappling_rolling_features(df, history)
+
+df = add_fighter_cumulative_features(
+    df,
+    history
+)
+
+
+df = add_striking_rolling_features(
+    df,
+    history
+)
+
+
+df = add_grappling_rolling_features(
+    df,
+    history
+)
+
+
 
 # =========================
 # FEATURE ENGINEERING
@@ -68,65 +96,150 @@ df = add_grappling_rolling_features(df, history)
 
 df = create_features(df)
 
+
+
 # =========================
-# EVALUATION FUNCTION
+# EVALUATION
 # =========================
 
 def evaluate_model(name, y_true, y_pred, y_prob):
-    print(f"\n================ {name.upper()} ================\n")
-    print(f"Accuracy: {accuracy_score(y_true, y_pred):.4f}")
-    print(f"ROC AUC: {roc_auc_score(y_true, y_prob):.4f}")
-    print(f"F1 Score: {f1_score(y_true, y_pred):.4f}")
+
+    print(
+        f"\n================ {name.upper()} ================\n"
+    )
+
+    print(
+        f"Accuracy: {accuracy_score(y_true, y_pred):.4f}"
+    )
+
+    print(
+        f"ROC AUC: {roc_auc_score(y_true, y_prob):.4f}"
+    )
+
+    print(
+        f"F1 Score: {f1_score(y_true, y_pred):.4f}"
+    )
+
+
     print("\nClassification Report:")
-    print(classification_report(y_true, y_pred))
+
+    print(
+        classification_report(
+            y_true,
+            y_pred
+        )
+    )
+
+
     print("Confusion Matrix:")
-    print(confusion_matrix(y_true, y_pred))
+
+    print(
+        confusion_matrix(
+            y_true,
+            y_pred
+        )
+    )
 
 
 # =========================
-# LOGISTIC REGRESSION
+# MODELS
 # =========================
 
-lr_model, lr_acc, lr_preds, lr_probs, y_test_lr = run_logistic_regression(
-    df,
-    LINEAR_FEATURES,
-    "fighter_1_win"
-)
+models = [
 
-evaluate_model("Logistic Regression", y_test_lr, lr_preds, lr_probs)
-
-
-# =========================
-# XGBOOST
-# =========================
-
-xgb_model, xgb_acc, xgb_preds, xgb_probs, y_test_xgb = run_xgboost(
-    df,
-    TREE_FEATURES,
-    "fighter_1_win"
-)
-
-evaluate_model("XGBoost", y_test_xgb, xgb_preds, xgb_probs)
-
-
-# =========================
-# QUICK COMPARISON TABLE
-# =========================
-
-results = pd.DataFrame([
     {
-        "model": "logistic_regression",
-        "accuracy": accuracy_score(y_test_lr, lr_preds),
-        "roc_auc": roc_auc_score(y_test_lr, lr_probs),
-        "f1": f1_score(y_test_lr, lr_preds),
+        "name": "Logistic Regression",
+        "function": run_logistic_regression,
+        "features": LINEAR_FEATURES
     },
-    {
-        "model": "xgboost",
-        "accuracy": accuracy_score(y_test_xgb, xgb_preds),
-        "roc_auc": roc_auc_score(y_test_xgb, xgb_probs),
-        "f1": f1_score(y_test_xgb, xgb_preds),
-    }
-])
 
-print("\n================ MODEL COMPARISON ================\n")
-print(results)
+    {
+        "name": "XGBoost",
+        "function": run_xgboost,
+        "features": TREE_FEATURES
+    },
+
+    {
+        "name": "CatBoost",
+        "function": run_catboost,
+        "features": TREE_FEATURES
+    },
+
+    {
+        "name": "Random Forest",
+        "function": run_random_forest,
+        "features": TREE_FEATURES
+    }
+
+]
+
+
+# =========================
+# RUN MODELS
+# =========================
+
+results = []
+
+
+for model_info in models:
+
+    name = model_info["name"]
+
+    model_function = model_info["function"]
+
+    features = model_info["features"]
+
+
+    model, acc, preds, probs, y_test = model_function(
+        df,
+        features,
+        "fighter_1_win"
+    )
+
+
+    evaluate_model(
+        name,
+        y_test,
+        preds,
+        probs
+    )
+
+
+    results.append(
+        {
+            "model": name,
+            "accuracy": accuracy_score(
+                y_test,
+                preds
+            ),
+            "roc_auc": roc_auc_score(
+                y_test,
+                probs
+            ),
+            "f1": f1_score(
+                y_test,
+                preds
+            )
+        }
+    )
+
+
+
+# =========================
+# MODEL COMPARISON
+# =========================
+
+results = pd.DataFrame(results)
+
+
+print(
+    "\n================ MODEL COMPARISON ================\n"
+)
+
+
+print(
+    results.sort_values(
+        by="roc_auc",
+        ascending=False
+    )
+)
