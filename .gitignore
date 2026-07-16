@@ -1,9 +1,10 @@
 # Environment variables
 .env
 .env.*
+model/env        # <--- Explicitly ignores the "env" file in your model folder
 
 # Python virtual environments
-model/env/
+**/env/          # Keeps ignoring any "env" directories
 env/
 venv/
 
