@@ -25,9 +25,7 @@ from sklearn.metrics import (
 # =========================
 
 DB_URL = (
-    "postgresql+psycopg://neondb_owner:npg_Bo2SUY6ngypR@"
-    "ep-orange-frost-afcl94sd-pooler.c-2.us-west-2.aws.neon.tech/"
-    "neondb?sslmode=require"
+    ""
 )
 
 engine = create_engine(
