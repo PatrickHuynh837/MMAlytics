@@ -35,6 +35,7 @@ DB_URL = os.getenv("DB_URL")
 if not DB_URL:
     raise ValueError("DB_URL is missing from environment variables")
 
+
 engine = create_engine(
     DB_URL,
     pool_pre_ping=True,

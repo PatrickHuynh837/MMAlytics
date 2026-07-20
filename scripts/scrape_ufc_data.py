@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine
+
 from src.ingestion.scrape_fight_data import *
 from src.ingestion.scrape_fight_urls import *
 from src.ingestion.scrape_event_data import *
@@ -13,17 +14,20 @@ from src.ingestion.scrape_api_odds import *
 from src.ingestion.csv_rankings import *
 from src.ingestion.csv_odds import *
 
-import re           
-
-DB_URL = (
-    
-    "postgresql+psycopg://neondb_owner:npg_Bo2SUY6ngypR@"
-    "ep-orange-frost-afcl94sd-pooler.c-2.us-west-2.aws.neon.tech/"
-    "neondb?sslmode=require"
-  
-)
+import os
+from dotenv import load_dotenv
+from pathlib import Path
 
 import logging
+
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
+DB_URL = os.getenv("DB_URL")
+
+if not DB_URL:
+    raise ValueError("DB_URL is missing from environment variables")
+
 
 logging.basicConfig(
     level=logging.INFO,
