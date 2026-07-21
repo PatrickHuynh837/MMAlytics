@@ -51,8 +51,8 @@ df = pd.read_sql(
     """
     SELECT *
     FROM ml.fight_dataset
-    WHERE event_date >= '2021-01-01'
-      AND event_date <= '2026-07-15'
+    WHERE event_date >= '2026-01-01'
+      AND event_date <= '2026-07-18'
     """,
     engine
 )
