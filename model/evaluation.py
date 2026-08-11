@@ -125,7 +125,7 @@ def evaluate_model(name, y_true, y_pred, y_prob):
     )
 
     print(
-        f"F1 Score: {f1_score(y_true, y_pred):.4f}"
+        f"F1 Score (Macro): {f1_score(y_true, y_pred,average='macro'):.4f}"
     )
 
 
@@ -224,9 +224,10 @@ for model_info in models:
                 y_test,
                 probs
             ),
-            "f1": f1_score(
+            "f1(macro)": f1_score(
                 y_test,
-                preds
+                preds,
+                average = "macro"
             )
         }
     )

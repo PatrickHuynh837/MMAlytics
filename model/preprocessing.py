@@ -255,14 +255,18 @@ def add_fighter_cumulative_features(df, history):
     # -------------------------
     history = history.copy()
 
-    history["win"] = (history["fighter"] == history["winner"]).astype(int)
-    history["loss"] = 1 - history["win"]
+    history["win"] = (
+        history["fighter"] == history["winner"]
+    ).astype(int)
 
     history["draw"] = (
-        (history["winner"] == "Draw").astype(int)
-        if "Draw" in history["winner"].values
-        else 0
-    )
+        history["winner"] == "Draw"
+    ).astype(int)
+
+    history["loss"] = (
+        (history["win"] == 0) &
+        (history["draw"] == 0)
+    ).astype(int)
 
     # -------------------------
     # Prior cumulative stats
