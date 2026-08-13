@@ -515,39 +515,3 @@ application.
 The frontend is responsible for presenting the resulting predictions in
 a way that is understandable to users.
 
----
-
-## Frontend Design Principles
-
-The frontend architecture follows several principles:
-
-### Separation of Concerns
-
-Page components, reusable UI components, API communication, server state,
-and client state should have distinct responsibilities.
-
-### Backend Abstraction
-
-The frontend should interact with application data through the API
-rather than directly accessing infrastructure.
-
-### Reusable Components
-
-Common UI patterns should be implemented as reusable components rather
-than duplicated across pages.
-
-### Server-State Management
-
-Data retrieved from the backend should be managed through a dedicated
-server-state solution such as TanStack Query.
-
-### User-Oriented Analytics
-
-Complex statistical and ML outputs should be presented in a form that
-users without ML expertise can understand.
-
-### Responsive Experience
-
-Data-heavy operations such as API requests and ML inference should
-provide clear loading, success, and error states so the application
-remains responsive throughout the user experience.
