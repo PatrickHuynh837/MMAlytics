@@ -123,20 +123,7 @@ Planned capabilities:
 
 ---
 
-# Current Model Performance
 
-Models are evaluated using accuracy, ROC AUC, and F1 score.
-
-| Model | Accuracy | ROC AUC | F1 Score |
-|------|----------|---------|----------|
-| Random Forest | 71.2% | 0.772 | 0.740 |
-| CatBoost | 71.2% | 0.759 | 0.748 |
-| Logistic Regression | 70.1% | 0.758 | 0.725 |
-| XGBoost | 68.6% | 0.749 | 0.721 |
-
-The current results demonstrate that historical fight statistics contain meaningful predictive signals, while future improvements will focus on additional features, automation, and model refinement.
-
----
 
 # Tech Stack
 
