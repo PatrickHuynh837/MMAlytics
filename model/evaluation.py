@@ -1,5 +1,9 @@
 from preprocessing import *
-from features import create_features, LINEAR_FEATURES, TREE_FEATURES
+from features import (
+    create_features,
+    LINEAR_FEATURES,
+    TREE_FEATURES
+)
 
 from models import (
     run_logistic_regression,
@@ -25,15 +29,33 @@ from pathlib import Path
 
 
 # =========================
+# EVALUATION PERIOD
+# =========================
+
+EVAL_START = pd.Timestamp("2023-08-15")
+EVAL_END = pd.Timestamp("2026-08-15")
+
+# Use an exclusive upper bound so the entire
+# 2026-08-15 date is included.
+EVAL_END_EXCLUSIVE = (
+    EVAL_END + pd.Timedelta(days=1)
+)
+
+
+# =========================
 # DB CONNECTION
 # =========================
 
-load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+load_dotenv(
+    Path(__file__).resolve().parents[1] / ".env"
+)
 
 DB_URL = os.getenv("DB_URL")
 
 if not DB_URL:
-    raise ValueError("DB_URL is missing from environment variables")
+    raise ValueError(
+        "DB_URL is missing from environment variables"
+    )
 
 
 engine = create_engine(
@@ -44,24 +66,47 @@ engine = create_engine(
 
 
 # =========================
-# LOAD DATA
+# LOAD FULL HISTORICAL DATA
 # =========================
 
 df = pd.read_sql(
     """
     SELECT *
     FROM ml.fight_dataset
-    WHERE event_date >= '2024-01-01'
-      AND event_date <= '2026-08-09'
+    ORDER BY event_date ASC
     """,
     engine
 )
 
 
+# =========================
+# DATE PROCESSING
+# =========================
+
+df["event_date"] = pd.to_datetime(
+    df["event_date"]
+)
+
+
+# Keep all historical fights up to the
+# end of the evaluation period.
+#
+# This preserves pre-2023 history while
+# preventing future fights from entering
+# the evaluation dataset.
+
+df = df[
+    df["event_date"] < EVAL_END_EXCLUSIVE
+].copy()
+
+
+# =========================
+# TARGET
+# =========================
+
 df["fighter_1_win"] = (
     df["winner"] == df["fighter_1"]
 ).astype(int)
-
 
 
 # =========================
@@ -69,12 +114,26 @@ df["fighter_1_win"] = (
 # =========================
 
 df = preprocess_ranks(df)
+
 df = preprocess_weight(df)
 
 df = df.reset_index(drop=True)
 
 df["fight_id"] = df.index
 
+
+# =========================
+# BUILD FIGHTER HISTORY
+# =========================
+#
+# IMPORTANT:
+# History is built using the FULL
+# historical dataset.
+#
+# This allows a 2023 fight to use
+# fighter history from 2018-2022,
+# for example.
+# =========================
 
 history = build_fighter_history(df)
 
@@ -97,7 +156,6 @@ df = add_grappling_rolling_features(
 )
 
 
-
 # =========================
 # FEATURE ENGINEERING
 # =========================
@@ -105,29 +163,93 @@ df = add_grappling_rolling_features(
 df = create_features(df)
 
 
+# =========================
+# TRAIN / TEST SPLIT
+# =========================
+#
+# TRAIN:
+# Everything before 2023-08-15
+#
+# TEST:
+# 2023-08-15 through 2026-08-15
+#
+# Chronological split.
+# No random sampling.
+# =========================
+
+train_df = df[
+    df["event_date"] < EVAL_START
+].copy()
+
+
+test_df = df[
+    (df["event_date"] >= EVAL_START) &
+    (df["event_date"] < EVAL_END_EXCLUSIVE)
+].copy()
+
 
 # =========================
-# EVALUATION
+# SPLIT INFORMATION
 # =========================
 
-def evaluate_model(name, y_true, y_pred, y_prob):
+print(
+    "\n================ DATA SPLIT ================\n"
+)
+
+print(
+    f"Training period: "
+    f"{train_df['event_date'].min().date()} "
+    f"-> "
+    f"{train_df['event_date'].max().date()}"
+)
+
+print(
+    f"Evaluation period: "
+    f"{test_df['event_date'].min().date()} "
+    f"-> "
+    f"{test_df['event_date'].max().date()}"
+)
+
+print(
+    f"Training fights: {len(train_df)}"
+)
+
+print(
+    f"Evaluation fights: {len(test_df)}"
+)
+
+
+# =========================
+# EVALUATION FUNCTION
+# =========================
+
+def evaluate_model(
+    name,
+    y_true,
+    y_pred,
+    y_prob
+):
 
     print(
-        f"\n================ {name.upper()} ================\n"
+        f"\n================ "
+        f"{name.upper()} "
+        f"================\n"
     )
 
     print(
-        f"Accuracy: {accuracy_score(y_true, y_pred):.4f}"
+        f"Accuracy: "
+        f"{accuracy_score(y_true, y_pred):.4f}"
     )
 
     print(
-        f"ROC AUC: {roc_auc_score(y_true, y_prob):.4f}"
+        f"ROC AUC: "
+        f"{roc_auc_score(y_true, y_prob):.4f}"
     )
 
     print(
-        f"F1 Score (Macro): {f1_score(y_true, y_pred,average='macro'):.4f}"
+        f"F1 Score (Macro): "
+        f"{f1_score(y_true, y_pred, average='macro'):.4f}"
     )
-
 
     print("\nClassification Report:")
 
@@ -137,7 +259,6 @@ def evaluate_model(name, y_true, y_pred, y_prob):
             y_pred
         )
     )
-
 
     print("Confusion Matrix:")
 
@@ -199,7 +320,8 @@ for model_info in models:
 
 
     model, acc, preds, probs, y_test = model_function(
-        df,
+        train_df,
+        test_df,
         features,
         "fighter_1_win"
     )
@@ -216,22 +338,24 @@ for model_info in models:
     results.append(
         {
             "model": name,
+
             "accuracy": accuracy_score(
                 y_test,
                 preds
             ),
+
             "roc_auc": roc_auc_score(
                 y_test,
                 probs
             ),
+
             "f1(macro)": f1_score(
                 y_test,
                 preds,
-                average = "macro"
+                average="macro"
             )
         }
     )
-
 
 
 # =========================
@@ -242,7 +366,9 @@ results = pd.DataFrame(results)
 
 
 print(
-    "\n================ MODEL COMPARISON ================\n"
+    "\n================ "
+    "MODEL COMPARISON "
+    "================\n"
 )
 
 
