@@ -34,3 +34,5 @@ The system currently focuses on UFC data, with the long-term goal of supporting 
   - Fighter analytics
   - Matchup research
   - Predictive modeling
+  - Style discovery and trajectory analysis
+  - Historical similarity

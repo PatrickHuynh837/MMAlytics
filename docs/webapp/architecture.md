@@ -2,64 +2,110 @@
 
 ## Overview
 
-MMAlytics is a web application for UFC/MMA fight analysis, fighter
-statistics, historical analytics, and machine-learning-based fight
-predictions.
+MMAlytics is a web application for UFC/MMA fight analysis, fighter statistics, historical analytics, matchup analysis, and machine-learning-based fight prediction.
 
 The application is composed of four primary systems:
 
 - Frontend
 - Backend API
-- Machine Learning
+- Machine Learning and Analytics
 - PostgreSQL Database
 
-The frontend communicates with the backend API through HTTP requests.
-The backend coordinates access to application data and the machine
-learning prediction system.
+The frontend communicates with the backend API through HTTP requests. The backend coordinates access to application data, analytical services, and the machine-learning prediction system.
 
----
+The architecture is designed to support an initial prediction-focused MVP while providing a foundation for a broader MMA analytics platform.
+
+## Product Scope
+
+MMAlytics is developed in two stages.
+
+### MVP
+
+The MVP focuses on establishing the core MMA data and prediction pipeline.
+
+Primary capabilities include:
+
+- UFC fight and fighter data
+- Fighter profiles
+- Historical fight statistics
+- Fighter comparisons
+- Upcoming fight predictions
+- Basic matchup visualization
+- Historical performance analytics
+- Machine-learning model evaluation
+
+The MVP establishes the data pipeline, feature engineering system, prediction models, and API required for the application.
+
+### Fleshed-Out Application
+
+The full application expands beyond prediction into deeper MMA analytics.
+
+Planned analytical capabilities include:
+
+- Fighter career trajectories
+- Time-aware performance analysis
+- Fighter style/archetype discovery
+- Style evolution
+- Opponent-adjusted performance
+- Matchup-specific analysis
+- Historical fighter similarity
+- Division-level analytics
+- Fighter development and trend analysis
+- Advanced prediction explanations
+- Exploratory historical analytics
+
+The purpose of these features is to allow users to investigate how fighters perform, how their styles evolve, how styles interact, and what historical data can reveal about MMA, rather than limiting the application to predicting fight outcomes.
 
 ## Architecture
 
 ```text
-┌──────────────────────┐
-│        User          │
-└──────────┬───────────┘
-           │
-           ↓
-┌──────────────────────┐
-│   React Frontend     │
-│                      │
-│ • Fight Dashboard    │
-│ • Fighter Profiles   │
-│ • Predictions        │
-│ • Comparisons        │
-│ • Analytics          │
-└──────────┬───────────┘
-           │ HTTP
-           ↓
-┌──────────────────────┐
-│   Python / FastAPI   │
-│      Backend API     │
-│                      │
-│ • Fighter Data       │
-│ • Fight Data         │
-│ • Historical Data    │
-│ • Prediction API     │
-└───────┬────────┬─────┘
-        │        │
-        ↓        ↓
-┌────────────┐  ┌──────────────────┐
-│ PostgreSQL │  │ Machine Learning │
-│            │  │                  │
-│ • Fighters │  │ • Features       │
-│ • Fights   │  │ • Models         │
-│ • Stats    │  │ • Inference      │
-│ • History  │  │ • Predictions    │
-└────────────┘  └──────────────────┘
+┌──────────────────────────────┐
+│            User              │
+└──────────────┬───────────────┘
+               │
+               ↓
+┌──────────────────────────────┐
+│        React Frontend        │
+│                              │
+│ • Fight Dashboard            │
+│ • Fighter Profiles           │
+│ • Predictions                │
+│ • Comparisons                │
+│ • Matchup Analysis           │
+│ • Historical Analytics       │
+│ • Career / Style Analytics   │
+│ • Division Analytics         │
+└──────────────┬───────────────┘
+               │ HTTP
+               ↓
+┌──────────────────────────────┐
+│       Python / FastAPI       │
+│          Backend             │
+│                              │
+│ • Fighter Data API           │
+│ • Fight Data API             │
+│ • Analytics API              │
+│ • Comparison API             │
+│ • Matchup API                │
+│ • Prediction API             │
+│ • Application Logic          │
+└──────────────┬───────────────┘
+               │
+       ┌───────┴────────┐
+       ↓                ↓
+┌──────────────┐ ┌─────────────────────────┐
+│ PostgreSQL   │ │ ML / Analytics System   │
+│              │ │                         │
+│ • Fighters   │ │ • Feature Engineering   │
+│ • Fights     │ │ • Performance Analysis  │
+│ • Stats      │ │ • Style Discovery       │
+│ • History    │ │ • Trajectory Analysis   │
+│ • Predictions│ │ • Similarity Analysis   │
+│              │ │ • Matchup Analysis      │
+└──────────────┘ │ • Prediction Models     │
+                 │ • Model Inference       │
+                 └─────────────────────────┘
 ```
-
----
 
 ## System Components
 
@@ -67,14 +113,22 @@ learning prediction system.
 
 The frontend provides the user-facing interface for MMAlytics.
 
-Primary interfaces include:
-
+**MVP Interfaces**
 - Fight Dashboard
 - Fighter Profiles
 - Prediction View
 - Fighter Comparison
-- Historical Analytics
+- Basic Historical Analytics
 - Matchup Visualization
+
+**Full Application Interfaces**
+- Fighter Career Analytics
+- Style and Archetype Analysis
+- Performance Trends
+- Historical Fighter Similarity
+- Division Analytics
+- Advanced Matchup Analysis
+- Prediction Explanation
 
 The frontend communicates with the backend through HTTP API requests.
 
@@ -84,41 +138,46 @@ The frontend is responsible for:
 - Displaying historical statistics
 - Submitting prediction requests
 - Displaying prediction results
-- Providing visualizations for matchup analysis
+- Visualizing fighter performance
+- Visualizing changes in fighter performance over time
+- Presenting matchup analysis
+- Presenting analytical results generated by the backend
 
----
+The frontend does not directly access the database or machine-learning models.
 
 ### Backend API
 
-The backend provides the application's HTTP API and acts as the
-coordination layer between the frontend, database, and machine learning
-system.
+The backend provides the application's HTTP API and acts as the coordination layer between the frontend, database, and ML/analytics system.
 
 The backend is responsible for:
 
 - Fighter data retrieval
 - Fight data retrieval
-- Historical analysis
+- Historical data retrieval
+- Fighter analytics
+- Comparison requests
+- Matchup analysis
 - Prediction requests
 - Prediction responses
 - Database access
 - ML model inference
+- Analytical result delivery
 
 The backend is implemented in Python using FastAPI.
 
-Because the ML system is also implemented in Python, inference can be
-performed directly within the backend. This allows the application to
-share feature engineering and model-loading logic without requiring a
-separate inference service.
+Because the ML and analytics system is also implemented in Python, analytical computations and model inference can initially be performed directly within the backend without requiring separate services.
 
----
+This architecture allows the system to remain relatively simple while providing a path toward separating computationally intensive services if the application grows.
 
-### Machine Learning System
+### Machine Learning and Analytics System
 
-The machine learning system is responsible for generating fight
-predictions from historical fight data.
+The machine-learning and analytics system provides the computational layer for MMAlytics.
 
-The ML pipeline includes:
+Rather than treating machine learning exclusively as a prediction system, this layer supports both predictive modeling and statistical analysis of MMA performance.
+
+**MVP Capabilities**
+
+The MVP ML pipeline includes:
 
 - Data preparation
 - Feature engineering
@@ -126,110 +185,188 @@ The ML pipeline includes:
 - Model evaluation
 - Model versioning
 - Model inference
+- Prediction generation
 
-The ML system is implemented in Python and uses the datasets and
-feature-engineering processes defined in the `mlsystems/` documentation.
+The primary ML task is fight outcome prediction.
 
-The prediction system separates:
+**Full Application Capabilities**
 
-- Offline data processing and model training
-- Online model inference
+The expanded analytics system can include:
 
-This allows prediction requests to use preprocessed historical
-information rather than rebuilding the entire historical dataset for
-each request.
+- **Fighter Performance Analysis**
+  Analyze fighter performance using historical and time-aware statistics.
+  Examples include:
+  - Recent performance
+  - Career performance
+  - Performance trends
+  - Striking development
+  - Grappling development
+  - Defensive development
+  - Performance changes over time
 
----
+- **Fighter Trajectory**
+  Represent fighter performance as a changing state over their career.
+  The system can identify changes in:
+  - Fighting style
+  - Performance level
+  - Pace
+  - Striking behavior
+  - Grappling behavior
+  - Defensive performance
+  - Finishing tendencies
+
+- **Style / Archetype Discovery**
+  Unsupervised learning can be used to identify statistically similar fighting styles from observed MMA performance.
+  These archetypes describe observable MMA behavior, rather than attempting to infer a fighter's underlying martial-arts training background.
+
+- **Opponent-Adjusted Performance**
+  Performance metrics can account for the quality of opponents faced.
+  This allows the application to distinguish between:
+  - Raw performance
+  - Performance relative to opponent strength
+  - Performance relative to expected performance
+
+- **Matchup Analysis**
+  The system can compare the characteristics of two fighters to identify statistical matchup advantages.
+  Potential inputs include:
+  - Striking differentials
+  - Grappling differentials
+  - Defensive characteristics
+  - Pace
+  - Style interactions
+  - Opponent-adjusted performance
+  - Physical characteristics
+
+- **Historical Similarity**
+  The system can identify fighters or historical fighter states with similar statistical profiles.
+  This can support questions such as:
+  - Which historical fighters most resemble this fighter?
+  - How did similar fighters develop?
+  - What happened to similar fighters at comparable career stages?
+
+- **Prediction**
+  The prediction system uses the analytical features generated from historical data to estimate the outcome of upcoming fights.
 
 ### Database
 
 PostgreSQL provides persistent application storage.
 
-The database stores application and historical data including:
+The database stores:
 
 - Fighters
 - Fights
 - Fighter statistics
-- Historical data
+- Historical fight data
+- Rankings and relevant metadata
 - Predictions
+- Application data
 
 The database acts as the persistent source of application data.
 
-Model-specific transformations and derived features can be separated
-from the core historical data where appropriate.
+Derived analytical features can be stored separately from the core historical data where appropriate.
 
----
+This separation allows the underlying fight data to remain independent from particular analytical models or feature-engineering implementations.
 
 ## Technology Stack
 
 ### Frontend
-
 - React
 
 ### Backend
-
 - Python
 - FastAPI
 
 ### Database
-
 - PostgreSQL
 - Neon
 
-### Machine Learning
-
+### Machine Learning / Analytics
 - Python
 - Pandas
 - Scikit-learn
 
----
+Additional ML libraries may be introduced as model experimentation expands.
 
 ## Data Flow
 
-The general request flow is:
+The application supports several analytical request paths.
+
+### General Analytics Request
 
 ```text
 User
-  ↓
+ ↓
 React Frontend
-  ↓ HTTP Request
-Python / FastAPI Backend
-  ↓
-  ├──────────────→ PostgreSQL
-  │                    ↓
-  │              Historical Data
-  │                    ↓
-  │              Fighter Statistics
-  │
-  └──────────────→ ML Inference
-                       ↓
-                 Prediction Model
-                       ↓
-                 Prediction Result
-                       ↓
-                  API Response
-                       ↓
-                React Frontend
-                       ↓
-                     User
+ ↓ HTTP
+FastAPI Backend
+ ↓
+PostgreSQL
+ ↓
+Historical Fight Data
+ ↓
+ML / Analytics System
+ ↓
+Analytical Result
+ ↓
+FastAPI Response
+ ↓
+React Frontend
+ ↓
+User
 ```
 
-The backend determines which data is required for a request and
-coordinates access to the database and ML prediction system.
+### Prediction Request
 
----
+```text
+Upcoming Fight
+ ↓
+React Frontend
+ ↓
+FastAPI Backend
+ ↓
+Historical Fighter Data
+ ↓
+Feature Generation
+ ↓
+Prediction Model
+ ↓
+Prediction
+ ↓
+FastAPI Response
+ ↓
+React Frontend
+```
+
+### Historical Analysis Request
+
+```text
+User Analysis Request
+ ↓
+React Frontend
+ ↓
+FastAPI Backend
+ ↓
+Historical Data
+ ↓
+Analytics / Feature Pipeline
+ ↓
+Performance Analysis
+ ↓
+FastAPI Response
+ ↓
+Visualization
+```
 
 ## Prediction Pipeline
 
-The prediction pipeline uses historical fight data to generate the
-features required by the prediction model.
+The prediction pipeline uses historical fight data to generate the features required by the prediction model.
 
 ```text
 Historical Fight Data
         ↓
 Data Processing
         ↓
-Feature Engineering
+Time-Aware Feature Engineering
         ↓
 Fighter / Matchup Features
         ↓
@@ -246,34 +383,65 @@ Frontend
 
 Historical fight data is transformed into fighter and matchup features.
 
-These features may include information derived from:
+Features can be derived from:
 
 - Fighter statistics
 - Previous fight results
 - Historical performance
 - Recent performance
+- Time-aware rolling statistics
+- Physical characteristics
+- Striking performance
+- Grappling performance
+- Defensive performance
 - Matchup characteristics
+- Opponent-adjusted performance
+- Fighter trajectory
+- Style/archetype characteristics
 
-The resulting features are provided to the trained prediction model
-during inference.
+Feature generation must use only information available prior to the fight being predicted to prevent temporal leakage.
 
 ### Model Inference
 
 When a user requests a prediction, the backend:
 
-1. Identifies the fighters and matchup.
-2. Retrieves the relevant historical information.
-3. Generates or retrieves the required features.
-4. Loads the appropriate model version.
-5. Performs inference.
-6. Returns the prediction through the API.
+- Identifies the fighters and matchup.
+- Retrieves the relevant historical information.
+- Generates or retrieves the required features.
+- Loads the appropriate model version.
+- Performs inference.
+- Returns the prediction through the API.
 
----
+## Analytics Pipeline
+
+The broader analytics system uses the historical dataset to generate analytical representations of fighters and fights.
+
+```text
+Historical Fight Data
+        ↓
+Data Processing
+        ↓
+Time-Aware Feature Engineering
+        ↓
+Fighter Performance Representation
+        ↓
+┌──────────────┬──────────────┬──────────────┐
+↓              ↓              ↓              ↓
+Performance   Style         Trajectory    Similarity
+Analysis      Discovery     Analysis      Analysis
+↓              ↓              ↓              ↓
+└──────────────┴──────────────┴──────────────┘
+                       ↓
+                Matchup Analytics
+                       ↓
+                Frontend / API
+```
+
+This pipeline provides the foundation for analytical features without requiring each feature to have an independent data-processing system.
 
 ## Data and Prediction Lifecycle
 
-Historical data and online prediction requests follow separate
-processing paths.
+Historical data and online prediction requests follow separate processing paths.
 
 ### Historical Data
 
@@ -286,11 +454,16 @@ Data Processing
       ↓
 Feature Engineering
       ↓
-Updated Fighter / Matchup Features
+Updated Fighter State
+      ↓
+Updated Analytics
 ```
 
 When new fights are completed, they are added to the historical dataset.
-Relevant fighter statistics and derived features are then updated.
+
+Relevant fighter statistics and derived features are updated.
+
+Analytical representations can then be regenerated or incrementally updated.
 
 ### Prediction Request
 
@@ -306,52 +479,57 @@ Prediction Model
 Prediction
 ```
 
-Upcoming fights use the most recent available historical information
-when generating predictions.
+Upcoming fights use only the most recent historical information available before the fight.
 
-This separation allows historical data processing to occur independently
-from online prediction requests.
-
----
+This separation allows historical data processing and model training to occur independently from online prediction requests.
 
 ## Architectural Responsibilities
 
 | Component | Primary Responsibility |
 |---|---|
-| React Frontend | User interface and visualization |
-| FastAPI Backend | API, application logic, and system coordination |
+| React Frontend | User interface, visualization, and analytical presentation |
+| FastAPI Backend | API, application logic, data coordination, and inference |
 | PostgreSQL | Persistent application and historical data |
-| ML System | Feature engineering, model training, evaluation, and inference |
-
----
+| ML / Analytics System | Feature engineering, statistical analysis, style discovery, model training, evaluation, and inference |
 
 ## Design Principles
 
-The architecture is designed around several principles:
+The architecture is designed around several principles.
 
 ### Separation of Concerns
 
-The frontend, backend, database, and ML system have distinct
-responsibilities.
-
-### Reusable ML Pipeline
-
-Feature engineering and model inference are implemented in Python so
-that the same logic can be reused during training and prediction.
+The frontend, backend, database, and ML/analytics system have distinct responsibilities.
 
 ### Historical Data as the Foundation
 
-Predictions are generated from historical fight and fighter data rather
-than treating each matchup as an isolated observation.
+MMAlytics treats historical fight data as the foundation for both analytics and prediction rather than treating each matchup as an isolated observation.
+
+### Time-Aware Analysis
+
+Performance and prediction features must respect the chronological nature of MMA data.
+
+Only information available before a fight should be used to represent a fighter for that fight.
+
+### Reusable Feature Engineering
+
+Feature engineering should be implemented as reusable components so that the same definitions can be used during model training, evaluation, analytics, and inference.
+
+### Analytics Before Prediction
+
+The prediction system is one component of MMAlytics rather than the sole purpose of the platform.
+
+The architecture supports broader analysis of fighter performance, styles, trajectories, matchups, and historical trends.
 
 ### Offline Training and Online Inference
 
-Computationally expensive data processing and model training can occur
-offline, while prediction requests use the resulting model and prepared
-features during online inference.
+Computationally expensive data processing and model training can occur offline, while prediction requests use prepared data and trained models during online inference.
 
 ### API-Based Communication
 
-The frontend communicates with the backend through a defined HTTP API,
-allowing the presentation layer to remain independent from the
-underlying database and ML implementation.
+The frontend communicates with the backend through a defined HTTP API, allowing the presentation layer to remain independent from the underlying database and ML implementation.
+
+### Extensible Analytics
+
+Analytical capabilities should be implemented within the existing ML/analytics layer where possible rather than creating independent services for each analytical feature.
+
+This keeps the initial application simple while allowing the system to expand as analytical requirements grow.
