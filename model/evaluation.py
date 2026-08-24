@@ -32,8 +32,8 @@ from pathlib import Path
 # EVALUATION PERIOD
 # =========================
 
-EVAL_START = pd.Timestamp("2023-08-15")
-EVAL_END = pd.Timestamp("2026-08-15")
+EVAL_START = pd.Timestamp("2023-01-01")
+EVAL_END = pd.Timestamp("2026-08-22")
 
 # Use an exclusive upper bound so the entire
 # 2026-08-15 date is included.
