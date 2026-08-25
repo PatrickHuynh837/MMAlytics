@@ -1,7 +1,10 @@
+import Navbar from "../components/Navbar";
+
 function Analytics() {
   return (
     <div>
-      <h2>Analytics</h2>
+      <h1>Analytics</h1>
+      <Navbar />
     </div>
   );
 }

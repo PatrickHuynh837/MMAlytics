@@ -1,7 +1,10 @@
+import Navbar from "../components/Navbar";
+
 function FighterProfile() {
   return (
     <div>
-      <h2>Fighter Profile</h2>
+      <h1>Fighter Profile</h1>
+      <Navbar />
     </div>
   );
 }

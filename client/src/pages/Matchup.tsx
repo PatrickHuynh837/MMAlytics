@@ -1,7 +1,10 @@
+import Navbar from "../components/Navbar";
+
 function Matchup() {
   return (
     <div>
-      <h2>Matchup</h2>
+      <h1>Matchup</h1>
+      <Navbar />
     </div>
   );
 }

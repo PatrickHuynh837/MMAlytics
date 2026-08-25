@@ -1,7 +1,10 @@
+import Navbar from "../components/Navbar";
+
 function Prediction() {
   return (
     <div>
-      <h2>Prediction</h2>
+      <h1>Prediction</h1>
+      <Navbar />
     </div>
   );
 }

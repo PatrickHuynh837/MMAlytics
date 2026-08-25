@@ -1,7 +1,10 @@
+import Navbar from "../components/Navbar";
+
 function Comparison() {
   return (
     <div>
-      <h2>Comparison</h2>
+      <h1>Comparison</h1>
+      <Navbar />
     </div>
   );
 }
