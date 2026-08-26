@@ -13,7 +13,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Home Page */}
         <Route path="/" element={<Home />} />
+
+        {/* Feature Pages */}
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/comparison" element={<Comparison />} />
         <Route path="/dashboard" element={<Dashboard />} />
