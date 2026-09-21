@@ -22,7 +22,7 @@ def chunk_dataframe(df, size=500):
 def get_soup_with_playwright(
     url,
     parser="lxml",
-    timeout=8000,
+    timeout=60000,
     selector=None
 ):
     with get_page(headless=True) as page:
