@@ -2,31 +2,43 @@ import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import "./styles/Home.css";
 
-const features = [
+interface FeatureItem {
+  title: string;
+  description: string;
+  link: string;
+  badge: string;
+}
+
+const features: FeatureItem[] = [
   {
     title: "Explore UFC Fighters",
     description: "Discover fighter records, performance stats, strengths, and historical trends.",
     link: "/fighters",
+    badge: "Fighters",
   },
   {
     title: "Compare Matchups",
     description: "Compare two fighters across striking, grappling, experience, and physical attributes.",
     link: "/matchup",
+    badge: "Versus",
   },
   {
     title: "Upcoming Fights",
     description: "Browse upcoming UFC events and explore scheduled fight cards.",
     link: "/events",
+    badge: "Events",
   },
   {
     title: "Fight Predictions",
     description: "Explore model-based predictions and evaluate fight outcomes with historical data.",
     link: "/prediction",
+    badge: "AI Model",
   },
   {
     title: "Historical Analytics",
     description: "Dive deep into UFC statistics and trends across fighters and divisions over time.",
     link: "/analytics",
+    badge: "Trends",
   },
 ];
 
@@ -49,6 +61,10 @@ function Home() {
       <div className="features-grid">
         {features.map((item) => (
           <Link to={item.link} key={item.title} className="feature-card">
+            <div className="feature-card-header">
+              <span className="feature-badge">{item.badge}</span>
+              <span className="feature-arrow">→</span>
+            </div>
             <h3>{item.title}</h3>
             <p>{item.description}</p>
           </Link>
