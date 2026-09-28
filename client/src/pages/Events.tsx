@@ -20,7 +20,7 @@ function Events() {
     async function fetchEvents() {
       try {
         setLoading(true);
-        const res = await fetch("/api/events");
+        const res = await fetch("http://127.0.0.1:8000/events");
         if (!res.ok) {
           throw new Error(`Failed to fetch events (Status: ${res.status})`);
         }
