@@ -19,6 +19,12 @@ function FighterProfile() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Number of fighters displayed on each page
+  const FIGHTERS_PER_PAGE = 30;
+
+  // Keeps track of which page the user is currently viewing
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
   useEffect(() => {
     async function fetchFighters() {
       try {
@@ -46,6 +52,21 @@ function FighterProfile() {
     fetchFighters();
   }, []);
 
+  // Calculate how many pages are needed
+  const totalPages = Math.ceil(
+    fighters.length / FIGHTERS_PER_PAGE
+  );
+
+  // Calculate where the current page starts
+  const startIndex =
+    (currentPage - 1) * FIGHTERS_PER_PAGE;
+
+  // Get only the fighters that belong to the current page
+  const currentFighters = fighters.slice(
+    startIndex,
+    startIndex + FIGHTERS_PER_PAGE
+  );
+
   return (
     <div>
       <Navbar />
@@ -61,41 +82,62 @@ function FighterProfile() {
       )}
 
       {!loading && !error && (
-        <div className="events-grid">
-          {fighters.map((fighter, idx) => (
-            <div
-              key={fighter.fighter_url || idx}
-              className="event-card"
-            >
-              <h3>
-                {fighter.fighter_name}{" "}
-                {fighter.fighter_nickname &&
-                  `"${fighter.fighter_nickname}"`}
-              </h3>
+        <>
+          <div className="events-grid">
+            {currentFighters.map((fighter, idx) => (
+              <div
+                key={fighter.fighter_url || idx}
+                className="event-card"
+              >
+                <h3>
+                  {fighter.fighter_name}{" "}
+                  {fighter.fighter_nickname &&
+                    `"${fighter.fighter_nickname}"`}
+                </h3>
 
-              <p>
-                Record: {fighter.fighter_w}-{fighter.fighter_l}-
-                {fighter.fighter_d}
-              </p>
+                <p>
+                  Record: {fighter.fighter_w}-{fighter.fighter_l}-
+                  {fighter.fighter_d}
+                </p>
 
-              <p>
-                Height: {fighter.fighter_height_cm} cm
-              </p>
+                <p>
+                  Height: {fighter.fighter_height_cm} cm
+                </p>
 
-              <p>
-                Weight: {fighter.fighter_weight_lbs} lbs
-              </p>
+                <p>
+                  Weight: {fighter.fighter_weight_lbs} lbs
+                </p>
 
-              <p>
-                Reach: {fighter.fighter_reach_cm} cm
-              </p>
+                <p>
+                  Reach: {fighter.fighter_reach_cm} cm
+                </p>
 
-              <p>
-                Stance: {fighter.fighter_stance}
-              </p>
-            </div>
-          ))}
-        </div>
+                <p>
+                  Stance: {fighter.fighter_stance}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div className="pagination">
+            {Array.from(
+              { length: totalPages },
+              (_, index) => {
+                const page = index + 1;
+
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    disabled={currentPage === page}
+                  >
+                    {page}
+                  </button>
+                );
+              }
+            )}
+          </div>
+        </>
       )}
     </div>
   );
