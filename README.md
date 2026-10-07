@@ -173,6 +173,20 @@ pip install -r requirements.txt
 
 # Usage
 
+## Run Backend API
+
+```bash
+uvicorn server.main:app --reload
+```
+
+## Run Frontend Application
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
 ## Run Data Collection
 
 ```bash
