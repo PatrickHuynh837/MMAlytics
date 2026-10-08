@@ -33,7 +33,7 @@ from pathlib import Path
 # =========================
 
 EVAL_START = pd.Timestamp("2023-08-15")
-EVAL_END = pd.Timestamp("2026-09-15")
+EVAL_END = pd.Timestamp("2026-10-10")
 
 EVAL_END_EXCLUSIVE = (
     EVAL_END + pd.Timedelta(days=1)
