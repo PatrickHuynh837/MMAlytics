@@ -23,8 +23,8 @@ const features: FeatureItem[] = [
     badge: "Versus",
   },
   {
-    title: "Upcoming Fights",
-    description: "Browse upcoming UFC events and explore scheduled fight cards.",
+    title: "Events",
+    description: "Browse upcoming UFC events and past events that you missed.",
     link: "/events",
     badge: "Events",
   },
