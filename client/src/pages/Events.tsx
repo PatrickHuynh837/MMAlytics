@@ -81,7 +81,8 @@ function Events() {
           <>
             <div className="events-grid">
               {currentEvents.map((event, index) => {
-                const eventId = getEventId(event.event_url ?? "");
+                const eventUrl = event.event_url ?? "";
+                const eventId = getEventId(eventUrl);
 
                 const location = [
                   event.location_city,
@@ -95,6 +96,7 @@ function Events() {
                   <Link
                     key={event.event_url ?? index}
                     to={`/events/${eventId}`}
+                    state={{ eventUrl }}
                     className="event-card"
                   >
                     <h3>{event.event_name}</h3>
