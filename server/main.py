@@ -20,4 +20,4 @@ app.add_middleware(
 # Get Endpoints
 app.include_router(events.router)
 app.include_router(fighters.router)
-# app.include_router(fights.router)
+app.include_router(fights.router)

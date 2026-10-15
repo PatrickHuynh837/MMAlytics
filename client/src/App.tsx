@@ -7,6 +7,7 @@ import Events from './pages/Events'
 import FighterProfile from './pages/FighterProfile'
 import Matchup from './pages/Matchup'
 import Prediction from './pages/Prediction'
+import EventDetails from "./pages/Event_Details";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function App() {
@@ -24,6 +25,8 @@ function App() {
         <Route path="/fighters" element={<FighterProfile />} />
         <Route path="/matchup" element={<Matchup />} />
         <Route path="/prediction" element={<Prediction />} />
+        <Route path="/events/:eventId" element={<EventDetails />} />
+        {/* <Route path="/fights/:fightId" element={<FightDetails />} /> */}
       </Routes>
     </BrowserRouter>
   )
