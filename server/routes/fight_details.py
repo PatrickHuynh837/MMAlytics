@@ -16,64 +16,25 @@ def get_fight_details(fight_url: str):
         result = connection.execute(
             text("""
                 SELECT
+                    -- Fight data
                     fight_url,
-                    event_url,
                     event_name,
-                    event_date,
-
-                    fighter_1,
-                    fighter_1_url,
-                    fighter_2,
-                    fighter_2_url,
-
-                    weight_class,
-                    gender,
-                    title_fight,
-                    num_rounds,
                     referee,
-
+                    fighter_1,
+                    fighter_2,
+                    fighter_1_url,
+                    fighter_2_url,
                     winner,
+                    num_rounds,
+                    title_fight,
+                    gender,
                     result,
                     result_details,
                     finish_round,
                     finish_time,
+                    weight_class,
 
-                    fighter_1_height_cm,
-                    fighter_1_weight_lbs,
-                    fighter_1_reach_cm,
-                    fighter_1_stance,
-                    fighter_1_dob,
-                    fighter_1_wins,
-                    fighter_1_losses,
-                    fighter_1_draws,
-
-                    fighter_1_slpm,
-                    fighter_1_str_acc,
-                    fighter_1_sapm,
-                    fighter_1_str_def,
-                    fighter_1_td_avg,
-                    fighter_1_td_acc,
-                    fighter_1_td_def,
-                    fighter_1_sub_avg,
-
-                    fighter_2_height_cm,
-                    fighter_2_weight_lbs,
-                    fighter_2_reach_cm,
-                    fighter_2_stance,
-                    fighter_2_dob,
-                    fighter_2_wins,
-                    fighter_2_losses,
-                    fighter_2_draws,
-
-                    fighter_2_slpm,
-                    fighter_2_str_acc,
-                    fighter_2_sapm,
-                    fighter_2_str_def,
-                    fighter_2_td_avg,
-                    fighter_2_td_acc,
-                    fighter_2_td_def,
-                    fighter_2_sub_avg,
-
+                    -- Fighter 1 fight statistics
                     fighter_1_knockdowns,
                     fighter_1_total_strikes_att,
                     fighter_1_total_strikes_succ,
@@ -85,6 +46,7 @@ def get_fight_details(fight_url: str):
                     fighter_1_reversals,
                     fighter_1_ctrl_time,
 
+                    -- Fighter 2 fight statistics
                     fighter_2_knockdowns,
                     fighter_2_total_strikes_att,
                     fighter_2_total_strikes_succ,
@@ -94,12 +56,7 @@ def get_fight_details(fight_url: str):
                     fighter_2_takedown_succ,
                     fighter_2_submission_att,
                     fighter_2_reversals,
-                    fighter_2_ctrl_time,
-
-                    fighter_1_rank,
-                    fighter_2_rank,
-                    fighter_1_odds,
-                    fighter_2_odds
+                    fighter_2_ctrl_time
 
                 FROM ml.fight_dataset
                 WHERE fight_url = :fight_url
