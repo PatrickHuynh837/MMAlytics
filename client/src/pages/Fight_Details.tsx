@@ -45,7 +45,7 @@ interface FightDetailsData {
 }
 
 function FightDetails() {
-  const { fight_url } = useParams<{ fight_url: string }>();
+  const { fightId } = useParams<{ fightId: string }>();
 
   const [fight, setFight] = useState<FightDetailsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,18 +53,23 @@ function FightDetails() {
 
   useEffect(() => {
     async function fetchFightDetails() {
-      if (!fight_url) {
-        setError("Fight URL is missing.");
+      if (!fightId) {
+        setError("Fight ID is missing.");
         setLoading(false);
         return;
       }
 
+      const fightUrl = `http://ufcstats.com/fight-details/${fightId}`;
+
       try {
         setLoading(true);
         setError(null);
+        setFight(null);
 
         const response = await fetch(
-          `/fight-details/?fight_url=${encodeURIComponent(fight_url)}`
+          `http://127.0.0.1:8000/fight-details/?fight_url=${encodeURIComponent(
+            fightUrl
+          )}`
         );
 
         if (!response.ok) {
@@ -90,7 +95,7 @@ function FightDetails() {
     }
 
     fetchFightDetails();
-  }, [fight_url]);
+  }, [fightId]);
 
   if (loading) {
     return (
@@ -109,7 +114,7 @@ function FightDetails() {
         <Navbar />
         <main>
           <p>{error ?? "Fight not found."}</p>
-          <Link to="/">Back to fights</Link>
+          <Link to="/events">Back to events</Link>
         </main>
       </>
     );
@@ -158,7 +163,7 @@ function FightDetails() {
       <Navbar />
 
       <main>
-        <Link to="/">← Back to fights</Link>
+        <Link to="/events">← Back to Events</Link>
 
         <section>
           <h1>

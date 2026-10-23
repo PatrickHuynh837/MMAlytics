@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from server.routes import events, fighters, fights
+from server.routes import events, fighters, fights,fight_details
 
 
 # Creates the application
@@ -21,3 +21,4 @@ app.add_middleware(
 app.include_router(events.router)
 app.include_router(fighters.router)
 app.include_router(fights.router)
+app.include_router(fight_details.router)

@@ -3,107 +3,132 @@ import { Link, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 
 interface Fight {
-  fight_url: string;
-  fighter_1: string;
-  fighter_2: string;
-  weight_class: string;
+fight_url: string;
+fighter_1: string;
+fighter_2: string;
+weight_class: string;
+}
+
+function getFightId(fightUrl: string): string {
+return fightUrl.split("/").pop() ?? "";
 }
 
 function EventDetails() {
-  const { eventId } = useParams<{ eventId: string }>();
-  const eventUrl = eventId
-    ? `http://ufcstats.com/event-details/${eventId}`
-    : undefined;
+const { eventId } = useParams<{ eventId: string }>();
+
+const eventUrl = eventId
+? `http://ufcstats.com/event-details/${eventId}`
+: undefined;
+
+const [fights, setFights] = useState<Fight[]>([]);
+const [loading, setLoading] = useState(true);
+const [error, setError] = useState<string | null>(null);
+
+useEffect(() => {
+async function fetchFights() {
+setLoading(true);
+setError(null);
+setFights([]);
+
+
   console.log("Event ID:", eventId);
   console.log("Event URL:", eventUrl);
-  const [fights, setFights] = useState<Fight[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchFights() {
-      if (!eventUrl) {
-        setError("Event URL not found. Please return to the events page.");
-        setLoading(false);
-        return;
-      }
+  if (!eventUrl) {
+    setError("Event URL not found. Please return to the events page.");
+    setLoading(false);
+    return;
+  }
 
-      try {
-        const response = await fetch(
-          `http://127.0.0.1:8000/fights/?event_url=${encodeURIComponent(eventUrl)}`
-        );
+  try {
+    const apiUrl =
+      `http://127.0.0.1:8000/fights/?event_url=${encodeURIComponent(eventUrl)}`;
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch fights (Status: ${response.status})`
-          );
-        }
+    console.log("Fetching fights from:", apiUrl);
 
-        const data: Fight[] = await response.json();
-        setFights(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Unknown error"
-        );
-      } finally {
-        setLoading(false);
-      }
+    const response = await fetch(apiUrl);
+
+    console.log("Response status:", response.status);
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch fights (Status: ${response.status})`
+      );
     }
 
-    fetchFights();
-  }, [eventUrl]);
+    const data: Fight[] = await response.json();
 
-  return (
-    <div className="events-page-container">
-      <Navbar />
+    console.log("Fights received from API:", data);
+    console.log("Number of fights:", data.length);
 
-      <div className="events-content">
-        <h1>Event Fight Card</h1>
+    setFights(data);
+  } catch (err) {
+    console.error("Error fetching fights:", err);
 
-        {loading && (
-          <p className="status-message">Loading fights...</p>
-        )}
+    setError(
+      err instanceof Error ? err.message : "Unknown error"
+    );
+  } finally {
+    setLoading(false);
+  }
+}
 
-        {error && (
-          <p className="status-message error-message">
-            Error: {error}
-          </p>
-        )}
+fetchFights();
 
-        {!loading && !error && fights.length === 0 && (
-          <p>No fights found for this event.</p>
-        )}
 
-        {!loading && !error && fights.length > 0 && (
-          <div className="events-grid">
-            {fights.map((fight) => {
-              const fightId = fight.fight_url.split("/").pop() ?? "";
+}, [eventId, eventUrl]);
 
-              return (
-                <Link
-                  key={fight.fight_url}
-                  to={`/fights/${encodeURIComponent(fightId)}`}
-                  state={{ fightUrl: fight.fight_url }}
-                  className="event-card"
-                >
-                  <h3>
-                    {fight.fighter_1} vs. {fight.fighter_2}
-                  </h3>
+return ( <div className="events-page-container"> <Navbar />
 
-                  <p>{fight.weight_class}</p>
-                </Link>
-              );
-            })}
-          </div>
-        )}
 
-        <Link to="/events" className="back-link">
-          Back to Events
-        </Link>
+  <div className="events-content">
+    <h1>Event Fight Card</h1>
+
+    {loading && (
+      <p className="status-message">Loading fights...</p>
+    )}
+
+    {error && (
+      <p className="status-message error-message">
+        Error: {error}
+      </p>
+    )}
+
+    {!loading && !error && fights.length === 0 && (
+      <p>No fights found for this event.</p>
+    )}
+
+    {!loading && !error && fights.length > 0 && (
+      <div className="events-grid">
+        {fights.map((fight) => {
+          const fightId = getFightId(fight.fight_url);
+
+          return (
+            <Link
+              key={fight.fight_url}
+              to={`/fights/${encodeURIComponent(fightId)}`}
+              state={{ fightUrl: fight.fight_url }}
+              className="event-card"
+            >
+              <h3>
+                {fight.fighter_1} vs. {fight.fighter_2}
+              </h3>
+
+              <p>{fight.weight_class}</p>
+            </Link>
+          );
+        })}
       </div>
-    </div>
-  );
+    )}
+
+    <Link to="/events" className="back-link">
+      Back to Events
+    </Link>
+  </div>
+</div>
+
+
+);
 }
 
 export default EventDetails;
-
